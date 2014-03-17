@@ -25,10 +25,10 @@ public class ClientConnectionQueue implements Runnable {
 			String line;
 			try {
 				line = bR.readLine();
-				System.out.println(line);
-				MapManager.bbQ.put(line + "\n");
+				RobotDatabase.bbQ.put(line + "\n");
 			} catch (IOException | InterruptedException e) {
-				e.printStackTrace();
+				ServerMain.console.append("CLIENT DISCONNECTED!\n");
+				return;
 			}
 		}
 
