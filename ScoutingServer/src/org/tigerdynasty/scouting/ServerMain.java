@@ -10,19 +10,20 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.Set;
 
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -39,6 +40,8 @@ public class ServerMain implements ActionListener {
 	Socket client;
 	InputManager input = new InputManager();
 	TeamCalculations tC;
+	FileTransfer fT;
+	int i = 0;
 
 	BoxLayout BL;
 	JScrollPane scrollPaneLeft;
@@ -69,16 +72,18 @@ public class ServerMain implements ActionListener {
 		scrollPanel = new JPanel();
 		BL = new BoxLayout(scrollPanel, BoxLayout.Y_AXIS);
 		scrollPanel.setLayout(BL);
+		JScrollPane consolePane = new JScrollPane(
+				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPaneLeft = new JScrollPane(
 				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		scrollPaneLeft.setPreferredSize(new Dimension(400, 500));
+		scrollPaneLeft.setPreferredSize(new Dimension(500, 500));
 		scrollPaneLeft.setAutoscrolls(true);
 		scrollPaneLeft.setVisible(true);
-		Dimension menuSize = new Dimension(400, 30);
+		Dimension menuSize = new Dimension(500, 30);
 		Random rand = new Random();
 		for (int i = 0; i < RobotDatabase.teamAmount; ++i) {
-			RobotDatabase.overAllRating[i] = rand.nextInt(50);
 			team[i] = new JMenuManager("Team" + i);
 			team[i].setText("Team " + RobotDatabase.teamNum[i] + "Rating: "
 					+ RobotDatabase.overAllRating[i]);
@@ -99,16 +104,20 @@ public class ServerMain implements ActionListener {
 		console.setVisible(true);
 		console.append("Attempting to start server... \n");
 		console.setEditable(false);
+		consolePane.getViewport().add(console);
+		consolePane.setPreferredSize(console.getPreferredSize());
+		consolePane.setVisible(true);
 		panel.add(scrollPaneLeft);
 		panel.add(text);
-		panel.add(console);
+		panel.add(consolePane);
 		frame.setVisible(true);
 		try {
 			Ss = new ServerSocket(5010);
 			console.append("Started server on port " + portNumber + "!\n");
 			console.append("Listening for new client connections now...\n");
 		} catch (IOException e) {
-			console.append("Failed to start server on port " + portNumber + "\n");
+			console.append("Failed to start server on port " + portNumber
+					+ "\n");
 		}
 		TeamCalculations.init();
 		mainUIThread.start();
@@ -116,6 +125,14 @@ public class ServerMain implements ActionListener {
 		Thread q = new Thread(queue);
 		q.start();
 		constantChecker();
+	}
+
+	public void copy(InputStream in, OutputStream out) throws IOException {
+		byte[] buf = new byte[8192];
+		int len = 0;
+		while ((len = in.read(buf)) != -1) {
+			out.write(buf, 0, len);
+		}
 	}
 
 	public void constantChecker() {
@@ -131,6 +148,10 @@ public class ServerMain implements ActionListener {
 			ClientConnectionQueue c = new ClientConnectionQueue(client);
 			Thread t = new Thread(c);
 			t.start();
+			fT= new FileTransfer(client);
+			RobotDatabase.fTArray.add(fT);
+			System.out.println(RobotDatabase.fTArray.toString());
+			fT.queue();
 		}
 	}
 
@@ -172,7 +193,8 @@ public class ServerMain implements ActionListener {
 	private class mainUIThread implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			List<JMenuManager> list = new ArrayList(RobotDatabase.teamAmount);
+			ArrayList<JMenuManager> list = new ArrayList(
+					RobotDatabase.teamAmount);
 			for (int i = 0; i < RobotDatabase.teamAmount; ++i) {
 				list.add(team[i]);
 				Collections.sort(list, new Comparator<JMenuManager>() {

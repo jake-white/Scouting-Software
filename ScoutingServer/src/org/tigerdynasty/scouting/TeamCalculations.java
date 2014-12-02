@@ -11,9 +11,11 @@ public class TeamCalculations {
 			for (int a = 0; a < RobotDatabase.shoot[i].size(); ++a) {
 				totalAmount += RobotDatabase.shoot[i].get(a);
 			}
-			int avgS = (int) Math.round(totalAmount
-					/ RobotDatabase.shoot[i].size() + 1);
-			RobotDatabase.avgShoot[i] = avgS;
+			if (RobotDatabase.shoot[i].size() > 0) {
+				int avgS = (int) Math.round(totalAmount
+						/ RobotDatabase.shoot[i].size());
+				RobotDatabase.avgShoot[i] = avgS;
+			}
 		}
 	}
 
@@ -23,9 +25,11 @@ public class TeamCalculations {
 			for (int a = 0; a < RobotDatabase.defend[i].size(); ++a) {
 				totalAmount += RobotDatabase.defend[i].get(a);
 			}
-			int avgD = (int) Math.round(totalAmount
-					/ RobotDatabase.defend[i].size() + 1);
-			RobotDatabase.avgDefend[i] = avgD;
+			if (RobotDatabase.defend[i].size() > 0) {
+				int avgD = (int) Math.round(totalAmount
+						/ RobotDatabase.defend[i].size());
+				RobotDatabase.avgDefend[i] = avgD;
+			}
 		}
 	}
 
@@ -34,9 +38,11 @@ public class TeamCalculations {
 			for (int a = 0; a < RobotDatabase.assist[i].size(); ++a) {
 				totalAmount += RobotDatabase.assist[i].get(a);
 			}
-			int avgAs = (int) Math.round(totalAmount
-					/ RobotDatabase.assist[i].size() + 1);
-			RobotDatabase.avgAssist[i] = avgAs;
+			if (RobotDatabase.assist[i].size() > 0) {
+				int avgAs = (int) Math.round(totalAmount
+						/ RobotDatabase.assist[i].size());
+				RobotDatabase.avgAssist[i] = avgAs;
+			}
 		}
 	}
 
@@ -45,9 +51,11 @@ public class TeamCalculations {
 			for (int a = 0; a < RobotDatabase.auton[i].size(); ++a) {
 				totalAmount += RobotDatabase.auton[i].get(a);
 			}
-			int avgAu = (int) Math.round(totalAmount
-					/ (RobotDatabase.auton[i].size() + 1));
-			RobotDatabase.avgAuton[i] = avgAu;
+			if (RobotDatabase.auton[i].size() > 0) {
+				int avgAu = (int) Math.round(totalAmount
+						/ RobotDatabase.auton[i].size());
+				RobotDatabase.avgAuton[i] = avgAu;
+			}
 		}
 	}
 
